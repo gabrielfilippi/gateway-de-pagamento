@@ -10,7 +10,7 @@ Content-Type: application/json
 
 {
     "name": "John Doe",
-    "email": "johsn.doe@examsple.com"
+    "email": "joddshsdsn.dfoe@examsple.com"
 }
 
 ### Obter dados da conta
@@ -18,4 +18,41 @@ Content-Type: application/json
 GET {{base_url}}/accounts
 X-API-Key: {{apiKey}}
 
-### Atualizar o saldo da conta
+### Criar uma nova fatura
+# @name createInvoice
+POST {{base_url}}/invoice
+X-API-Key: {{apiKey}}
+Content-Type: application/json
+
+{
+    "amount": 100,
+    "description": "Compra no Supermercado",
+    "payment_type": "credit_card",
+    "card_number": "4111111111111111",
+    "cvv": "123",
+    "expiry_month": 12,
+    "expiry_year": 2024,
+    "card_holder_name": "John Doe"
+}
+### Obter uma fatura específica
+# @name getInvoice
+@invoiceId = {{createInvoice.response.body.id}}
+GET {{base_url}}/invoice/{{invoiceId}}
+X-API-Key: {{apiKey}}
+
+### Tentar criar uma fatura com valor alto > 10000
+# @name createInvoiceHighAmount
+POST {{base_url}}/invoice
+X-API-Key: {{apiKey}}
+Content-Type: application/json
+
+{
+    "amount": 10500,
+    "description": "Compra no Supermercado",
+    "payment_type": "credit_card",
+    "card_number": "4111111111111111",
+    "cvv": "123",
+    "expiry_month": 12,
+    "expiry_year": 2024,
+    "card_holder_name": "John Doe"
+}

@@ -6,6 +6,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"curso-imersao-full-cycle/go-gateway-api/internal/service"
 	"curso-imersao-full-cycle/go-gateway-api/internal/web/handlers"
+	"curso-imersao-full-cycle/go-gateway-api/internal/web/middleware"
 )
 
 /**
@@ -19,6 +20,7 @@ type Server struct {
 	router *chi.Mux
 	server *http.Server
 	accountService *service.AccountService
+	invoiceService *service.InvoiceService
 	port string
 }
 
@@ -28,10 +30,11 @@ type Server struct {
 * @param port string
 * @return *Server
 */
-func NewServer(accountService *service.AccountService, port string) *Server {
+func NewServer(accountService *service.AccountService, invoiceService *service.InvoiceService, port string) *Server {
 	return &Server{
 		router: chi.NewRouter(), // cria um novo roteador
 		accountService: accountService, // define o serviço de conta
+		invoiceService: invoiceService, // define o serviço de fatura
 		port: port, // define a porta
 	}	
 }
@@ -42,11 +45,23 @@ func NewServer(accountService *service.AccountService, port string) *Server {
 func (s *Server) ConfigureRoutes() {
 	// cria um novo handler de conta
 	accountHandler := handlers.NewAccountHandler(s.accountService)
+	invoiceHandler := handlers.NewInvoiceHandler(s.invoiceService)
+	authMiddleware := middleware.NewAuthMiddleware(s.accountService)
 
 	// configura as rotas de conta
 	s.router.Route("/accounts", func(r chi.Router) {
 		r.Post("/", accountHandler.Create)
 		r.Get("/", accountHandler.Get)
+	})
+
+	s.router.Group(func(r chi.Router) {
+		r.Use(authMiddleware.Authenticate)
+
+		r.Route("/invoice", func(r chi.Router) {
+			r.Post("/", invoiceHandler.Create)
+			r.Get("/", invoiceHandler.ListByAccount)
+			r.Get("/{id}", invoiceHandler.GetByID)
+		})
 	})
 }
 

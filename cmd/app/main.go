@@ -33,9 +33,16 @@ func main() {
 	}
 	defer db.Close()
 
+	// Inicializa o repositório e o serviço de conta
 	accountRepository := repository.NewAccountRepository(db)
 	accountService := service.NewAccountService(accountRepository)
-	server := server.NewServer(accountService, os.Getenv("HTTP_PORT"))
+
+	// Inicializa o repositório e o serviço de fatura
+	invoiceRepository := repository.NewInvoiceRepository(db)
+	invoiceService := service.NewInvoiceService(invoiceRepository, *accountService)
+
+	// Inicializa o servidor
+	server := server.NewServer(accountService, invoiceService, os.Getenv("HTTP_PORT"))
 	server.ConfigureRoutes()
 
 	if err := server.Start(); err != nil {

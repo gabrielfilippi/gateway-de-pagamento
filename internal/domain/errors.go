@@ -20,4 +20,13 @@ var (
 
 	//Retorna erro se o saldo for insuficiente
 	ErrInsufficientBalance = errors.New("insufficient balance")
+
+	//Retorna erro se o cartão não for válido
+	ErrInvalidCreditCard = errors.New("invalid credit card")
+
+	//Retorna erro se o cartão não for válido
+	ErrInvalidAmount = errors.New("invalid amount")
+
+	//Retorna erro se o status não for válido
+	ErrInvalidStatus = errors.New("invalid status")
 )
